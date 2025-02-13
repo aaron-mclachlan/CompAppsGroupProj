@@ -52,5 +52,4 @@ enter_bttn = tk.Button(window,text='Submit',command=submit).grid(row=2)#enter bu
 
 
 
-
 window.mainloop()
