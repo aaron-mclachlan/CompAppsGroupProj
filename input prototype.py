@@ -8,11 +8,18 @@ window.geometry('800x600')#def window
 window.title('Conduction Simulator')
 
 
-user_temp = tk.IntVar() #def user temp input
+user_temp = tk.Variable() #def user temp input
 def submit(): #def function for submit button
     mtl1 = mtl1_menu.get()
     mtl2 = mtl2_menu.get()
     temp = user_temp.get()
+
+    #messsage box showing output values (Placeholder for future)
+    messagebox.showinfo(
+        message=f"""Metal 1: {mtl1}
+        Metal 2: {mtl2}
+        Temperature: {temp}"""
+    )
 
     print(f'Metal 1 is: {mtl1}')
     print(f'Metal 2 is: {mtl2}')
