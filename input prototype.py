@@ -24,6 +24,10 @@ def submit(): #def function for submit button
     print(f'Metal 1 is: {mtl1}')
     print(f'Metal 2 is: {mtl2}')
     print(f'Temperature: {temp}')
+
+    mtl1_menu.set('')
+    mtl2_menu.set('')
+    user_temp.set('')
    
 
 
