@@ -16,8 +16,6 @@ def home():
     theory_bttn = tk.Button(homewindow, text='Theory').grid(row=0, column=1)
     homewindow.mainloop()
 
-
-
 def inputwindow():
 
     window = tk.Tk()
