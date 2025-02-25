@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox,ttk
+import time
 def home():
     homewindow = tk.Tk()
 
@@ -10,10 +11,13 @@ def home():
     def sim_bttn():
       homewindow.destroy()
       inputwindow()
-      
+    
+    def theorypg_bttn():
+        homewindow.destroy()
+        theory_page()
 
     simulator_bttn = tk.Button(homewindow,text="Open Simulator",command=sim_bttn).grid(row=0,column=0)
-    theory_bttn = tk.Button(homewindow, text='Theory').grid(row=0, column=1)
+    theory_bttn = tk.Button(homewindow, text='Theory',command=theorypg_bttn).grid(row=0, column=1)
     homewindow.mainloop()
 
 def inputwindow():
@@ -52,5 +56,15 @@ def inputwindow():
     temp_input = tk.Entry(window,textvariable=user_temp).grid(row=1, column=2)#user input for temperature
     enter_bttn = tk.Button(window,text='Submit',command=submit).grid(row=2)#enter button
     window.mainloop()
+def theory_page():
+    theory_window = tk.Tk()
+    theory_window.geometry('800x600')
+    theory_window.title('Theory of Heat transfer')
+
+    def home_from_theory():
+        theory_window.destroy()
+        home()
+    
+    home_bttn = tk.Button(theory_window, text='Return home',command=home_from_theory).grid(row=0,column=0)
 
 home()
