@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox,ttk
-def home():
+def home():#Home page
     homewindow = tk.Tk()
 
     homewindow.geometry('800x600')
@@ -15,6 +15,7 @@ def home():
     simulator_bttn = tk.Button(homewindow,text="Open Simulator",command=sim_bttn).grid(row=0,column=0)
     theory_bttn = tk.Button(homewindow, text='Theory').grid(row=0, column=1)
     homewindow.mainloop()
+
 
 def inputwindow():
 

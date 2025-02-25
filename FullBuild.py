@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox,ttk
 import time
-def home():
+
+
+def home():# code for home page
     homewindow = tk.Tk()
 
     homewindow.geometry('800x600')
@@ -20,7 +22,7 @@ def home():
     theory_bttn = tk.Button(homewindow, text='Theory',command=theorypg_bttn).grid(row=0, column=1)
     homewindow.mainloop()
 
-def inputwindow():
+def inputwindow():#code for calculator page
 
     window = tk.Tk()
     window.geometry('800x600')#def window
@@ -56,7 +58,7 @@ def inputwindow():
     temp_input = tk.Entry(window,textvariable=user_temp).grid(row=1, column=2)#user input for temperature
     enter_bttn = tk.Button(window,text='Submit',command=submit).grid(row=2)#enter button
     window.mainloop()
-def theory_page():
+def theory_page():#code for theory page
     theory_window = tk.Tk()
     theory_window.geometry('800x600')
     theory_window.title('Theory of Heat transfer')
@@ -67,4 +69,4 @@ def theory_page():
     
     home_bttn = tk.Button(theory_window, text='Return home',command=home_from_theory).grid(row=0,column=0)
 
-home()
+home()#runs home page
