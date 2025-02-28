@@ -4,5 +4,5 @@
 2   bll bwl bhl
 3   bli bwi bhi
 4   sub
-5
+5   hom
 6
