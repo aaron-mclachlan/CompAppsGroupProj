@@ -1,0 +1,8 @@
+    0   1   2   3   4   5   6
+0   m1l t1l t2l 
+1   m1d t1i t2i 
+2   bll bwl bhl
+3   bli bwi bhi
+4   sub
+5
+6
