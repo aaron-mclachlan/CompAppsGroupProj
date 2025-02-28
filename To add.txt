@@ -1,6 +1,0 @@
-Error handling for non int temp values
-Make pretty
-Mathematical simulation
-add values to metals + more metals
-animations
-home menus
