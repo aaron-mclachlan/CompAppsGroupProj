@@ -3,6 +3,7 @@ from tkinter import messagebox,ttk
 import time
 import Theory_Page as theory
 import Calculator
+import Simulator as sim
 
 def home():# code for home page
     homewindow = tk.Tk()
@@ -11,7 +12,7 @@ def home():# code for home page
     homewindow.title('Home Menu')
 
 
-    def sim_bttn():
+    def calc_bttn():
       homewindow.destroy()
       Calculator.calculator()
     
@@ -19,8 +20,14 @@ def home():# code for home page
         homewindow.destroy()
         theory.theory_page()
 
-    simulator_bttn = tk.Button(homewindow,text="Open Calculator",command=sim_bttn).grid(row=0,column=0)
-    theory_bttn = tk.Button(homewindow, text='Open theory page',command=theorypg_bttn).grid(row=0, column=1)
+    def sim_bttn():
+       homewindow.destroy()
+       sim.simulation_page()
+
+    calculator_bttn = tk.Button(homewindow,text="Open Calculator",command=calc_bttn).grid(row=0,column=0)
+    simulator_bttn = tk.Button(homewindow,text="Open Simulator", command= sim_bttn).grid(row=0,column=1)
+    theory_bttn = tk.Button(homewindow, text='Open theory page',command=theorypg_bttn).grid(row=0, column=2)
+
 
 
     homewindow.mainloop()

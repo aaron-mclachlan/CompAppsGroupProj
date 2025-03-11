@@ -101,3 +101,5 @@ def calculator():#code for calculator page
     
     input_window_layout()
     window.mainloop()
+
+    
