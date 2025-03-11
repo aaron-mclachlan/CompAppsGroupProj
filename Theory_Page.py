@@ -12,5 +12,5 @@ def theory_page():#code for theory page
         theory_window.destroy()
         Home.home()
     
-    home_bttn = tk.Button(theory_window, text='Return home test',command=home_from_theory).grid(row=0,column=0)
+    home_bttn = tk.Button(theory_window, text='Return home',command=home_from_theory).grid(row=0,column=0)
     theory_window.mainloop()
