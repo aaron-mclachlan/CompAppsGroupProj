@@ -8,11 +8,9 @@ Theory Page:
     Add actual theory to page 
 
 Calculator page:
-    error handling for non integer inputs
-    actually make calculator work
     link output to simulation
 
 Simulator page:
-    make simulation work
-    link to calculator output
-    animate simulation(might be a bit crap)
+  rework simulation page new (user inputs)
+  link to animation
+  make animation work
