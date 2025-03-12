@@ -12,6 +12,7 @@ def calculator(): #Code for calculator window:
     # Defining Variables:
     user_temp1 = tk.DoubleVar()
     user_temp2 = tk.DoubleVar()
+    delta_T = tk.DoubleVar()
     bar_length = tk.DoubleVar()
     bar_width = tk.DoubleVar()
     bar_height = tk.DoubleVar()
@@ -22,21 +23,43 @@ def calculator(): #Code for calculator window:
 
     #Defining maths equations to be used:
     def solve_for_Q(k, A, delta_T, L):
-
         if L == 0:
-            raise ValueError("Length cannot be zero.")#preventing div/zero errors
+         raise ValueError("Length cannot be zero.")
         return (k * A * delta_T) / L
 
     def solve_for_k(Q, A, delta_T, L):
         if A == 0 or delta_T == 0 or L == 0:
-            raise ValueError("Width, height, temperature difference, and length cannot be zero.")#for /0 errors 
+            raise ValueError("Area, temperature difference, and length cannot be zero.")
         return (Q * L) / (A * delta_T)
 
     def solve_for_L(Q, k, A, delta_T):
         if k == 0 or A == 0 or delta_T == 0:
-            raise ValueError("Thermal conductivity, width, height, and temperature difference cannot be zero.")#for /0 errors 
+            raise ValueError("Thermal conductivity, area, and temperature difference cannot be zero.")
         return (k * A * delta_T) / Q
 
+    def solve_for_T1(T2, Q, k, W, H, L):
+        delta_T = solve_for_delta_T(Q, k, W, H, L)
+        return T2 + delta_T
+
+    def solve_for_T2(T1, Q, k, W, H, L):
+        delta_T = solve_for_delta_T(Q, k, W, H, L)
+        return T1 - delta_T
+
+    def solve_for_delta_T(Q, k, W, H, L):
+        A = W * H
+        if k == 0 or A == 0 or L == 0:
+            raise ValueError("Thermal conductivity, area, and length cannot be zero.")
+        return Q * L / (k * A)
+
+    def solve_for_width(Q, k, H, delta_T, L):
+        if k == 0 or H == 0 or delta_T == 0 or L == 0:
+            raise ValueError("Thermal conductivity, height, temperature difference, and length cannot be zero.")
+        return (Q * L) / (k * H * delta_T)
+
+    def solve_for_height(Q, k, W, delta_T, L):
+        if k == 0 or W == 0 or delta_T == 0 or L == 0:
+            raise ValueError("Thermal conductivity, width, temperature difference, and length cannot be zero.")
+        return (Q * L) / (k * W * delta_T)
 
     def calculate(): #Defining what happens when calculate button is pressed
         try: #error handling start
@@ -49,19 +72,34 @@ def calculator(): #Code for calculator window:
         
             # Pre calculations to simplify maths later
             A = W * H  # Cross-sectional area
-            delta_T = abs(T1 - T2) #change in temp
+            dT = abs(T1 - T2) #change in temp
             solve_for = variable_to_solve.get() #getting variable to solve for
 
             #Checking what to solve for and performing calculation:
             if solve_for == "Q":
-                result = solve_for_Q(k, A, delta_T, L)
+                result = solve_for_Q(k,A,dT,L)
                 heat_flow.set(result)
             elif solve_for == "k":
-                result = solve_for_k(Q, A, delta_T, L)
+                result = solve_for_k(Q,A,dT,L)
                 thermal_conductivity.set(result)
             elif solve_for == "L":
-                result = solve_for_L(Q, k, A, delta_T)
+                result = solve_for_L(Q,k,A,dT)
                 bar_length.set(result)
+            elif solve_for == "T1":
+                result = solve_for_T1(T2,Q,k,W,H,L)
+                user_temp1.set(result)
+            elif solve_for == "T2":
+                result = solve_for_T2(T1,Q,k,W,H,L)
+                user_temp2.set(result)
+            elif solve_for == "ΔT":
+                result = solve_for_delta_T(Q,k,W,H,L)
+                delta_T.set(result)
+            elif solve_for == "W":
+                result = solve_for_width(Q,k,H,dT,L)
+                bar_width.set(result)
+            elif solve_for == "H":
+                result = solve_for_height(Q,k,W,dT,L)
+                bar_height.set(result)
             else:
                 raise ValueError("Invalid selection.")
             
@@ -69,7 +107,7 @@ def calculator(): #Code for calculator window:
             messagebox.showinfo("Result", f"Calculated {solve_for} to be {result:.3f}")
 
             #Error Exceptions
-        except tk.TclError as blank_input_err: #blank inputs
+        except tk.TclError as blank_input_err: #deals with blank inputs
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"
             message = template.format(type(blank_input_err).__name__, blank_input_err.args)
             print("\n",message)
@@ -79,12 +117,12 @@ def calculator(): #Code for calculator window:
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"
             message = template.format(type(MiscErr).__name__, MiscErr.args)
             messagebox.showerror("error", message)
-            print("\n",message)
+            print("Misc Error! \n",message)
             
 
     #Selecting what to solve for
     ttk.Label(window, text="Solve for:").grid(row=0, column=0)
-    ttk.Combobox(window, textvariable=variable_to_solve, values=["Q", "k", "L"],state='readonly').grid(row=0, column=1)
+    ttk.Combobox(window, textvariable=variable_to_solve, values=["Q", "k", "L", "T1", "T2", "ΔT", "W", "H"],state='readonly').grid(row=0, column=1)
     
     # Inputs & labels
     ttk.Label(window, text="Temp 1:").grid(row=1, column=0)
