@@ -1,6 +1,45 @@
 import tkinter as tk
 from tkinter import messagebox,ttk
 import time
+def solve_for_Q(k, A, delta_T, L):
+        if L == 0:
+         raise ValueError("Length cannot be zero.")
+        return (k * A * delta_T) / L
+
+def solve_for_k(Q, A, delta_T, L):
+    if A == 0 or delta_T == 0 or L == 0:
+        raise ValueError("Area, temperature difference, and length cannot be zero.")
+    return (Q * L) / (A * delta_T)
+
+def solve_for_L(Q, k, A, delta_T):
+    if k == 0 or A == 0 or delta_T == 0:
+        raise ValueError("Thermal conductivity, area, and temperature difference cannot be zero.")
+    return (k * A * delta_T) / Q
+
+def solve_for_T1(T2, Q, k, W, H, L):
+    delta_T = solve_for_delta_T(Q, k, W, H, L)
+    return T2 + delta_T
+
+def solve_for_T2(T1, Q, k, W, H, L):
+    delta_T = solve_for_delta_T(Q, k, W, H, L)
+    return T1 - delta_T
+
+def solve_for_delta_T(Q, k, W, H, L):
+    A = W * H
+    if k == 0 or A == 0 or L == 0:
+        raise ValueError("Thermal conductivity, area, and length cannot be zero.")
+    return Q * L / (k * A)
+
+def solve_for_width(Q, k, H, delta_T, L):
+    if k == 0 or H == 0 or delta_T == 0 or L == 0:
+         raise ValueError("Thermal conductivity, height, temperature difference, and length cannot be zero.")
+    return (Q * L) / (k * H * delta_T)
+
+def solve_for_height(Q, k, W, delta_T, L):
+    if k == 0 or W == 0 or delta_T == 0 or L == 0:
+        raise ValueError("Thermal conductivity, width, temperature difference, and length cannot be zero.")
+    return (Q * L) / (k * W * delta_T)
+
 
 def calculator(): #Code for calculator window:
     window = tk.Tk()
@@ -22,44 +61,7 @@ def calculator(): #Code for calculator window:
     variable_to_solve = tk.StringVar(value="Q")
 
     #Defining maths equations to be used:
-    def solve_for_Q(k, A, delta_T, L):
-        if L == 0:
-         raise ValueError("Length cannot be zero.")
-        return (k * A * delta_T) / L
-
-    def solve_for_k(Q, A, delta_T, L):
-        if A == 0 or delta_T == 0 or L == 0:
-            raise ValueError("Area, temperature difference, and length cannot be zero.")
-        return (Q * L) / (A * delta_T)
-
-    def solve_for_L(Q, k, A, delta_T):
-        if k == 0 or A == 0 or delta_T == 0:
-            raise ValueError("Thermal conductivity, area, and temperature difference cannot be zero.")
-        return (k * A * delta_T) / Q
-
-    def solve_for_T1(T2, Q, k, W, H, L):
-        delta_T = solve_for_delta_T(Q, k, W, H, L)
-        return T2 + delta_T
-
-    def solve_for_T2(T1, Q, k, W, H, L):
-        delta_T = solve_for_delta_T(Q, k, W, H, L)
-        return T1 - delta_T
-
-    def solve_for_delta_T(Q, k, W, H, L):
-        A = W * H
-        if k == 0 or A == 0 or L == 0:
-            raise ValueError("Thermal conductivity, area, and length cannot be zero.")
-        return Q * L / (k * A)
-
-    def solve_for_width(Q, k, H, delta_T, L):
-        if k == 0 or H == 0 or delta_T == 0 or L == 0:
-            raise ValueError("Thermal conductivity, height, temperature difference, and length cannot be zero.")
-        return (Q * L) / (k * H * delta_T)
-
-    def solve_for_height(Q, k, W, delta_T, L):
-        if k == 0 or W == 0 or delta_T == 0 or L == 0:
-            raise ValueError("Thermal conductivity, width, temperature difference, and length cannot be zero.")
-        return (Q * L) / (k * W * delta_T)
+    
 
     def calculate(): #Defining what happens when calculate button is pressed
         try: #error handling start

@@ -24,9 +24,9 @@ def home():# code for home page
        homewindow.destroy()
        sim.simulation_page()
 
-    calculator_bttn = tk.Button(homewindow,text="Open Calculator",command=calc_bttn).grid(row=0,column=0)
-    simulator_bttn = tk.Button(homewindow,text="Open Simulator", command= sim_bttn).grid(row=0,column=1)
-    theory_bttn = tk.Button(homewindow, text='Open theory page',command=theorypg_bttn).grid(row=0, column=2)
+    calculator_bttn = ttk.Button(homewindow,text="Open Calculator",command=calc_bttn).grid(row=0,column=0)
+    simulator_bttn = ttk.Button(homewindow,text="Open Simulator", command= sim_bttn).grid(row=0,column=1)
+    theory_bttn = ttk.Button(homewindow, text='Open theory page',command=theorypg_bttn).grid(row=0, column=2)
 
 
 

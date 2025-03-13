@@ -13,5 +13,5 @@ def simulation_page():#Code for simulation page
         sim_pg.destroy()
         Home.home()
 
-    ExitSimBttn = tk.Button(sim_pg, text="Exit Simulator", command=close_sim).grid(row=0,column=0)
+    ExitSimBttn = ttk.Button(sim_pg, text="Exit Simulator", command=close_sim).grid(row=0,column=0)
     sim_pg.mainloop()
