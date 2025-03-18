@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox,ttk
 import time
-import Home
+import Windows.Home as Home
 
 #Defining calculator commands
 def solve_for_Q(k, A, delta_T, L):

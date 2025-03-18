@@ -7,9 +7,6 @@ Home Page:
 Theory Page:
     Add actual theory to page 
 
-Calculator page:
-    link output to simulation
-
 Simulator page:
   rework simulation page new (user inputs)
   link to animation

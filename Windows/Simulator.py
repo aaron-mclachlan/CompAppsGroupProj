@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import messagebox,ttk
 import time
-import Calculator
-import Home
+import Windows.Calculator as Calculator
+import Windows.Home as Home
 
 def simulation_page():#Code for simulation page
     sim_pg = tk.Tk()

@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox,ttk
 import time
-import Home
+import Windows.Home as Home
 
 def theory_page():#code for theory page
     theory_window = tk.Tk()

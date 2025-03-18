@@ -1,9 +1,9 @@
 import tkinter as tk
 from tkinter import messagebox,ttk
 import time
-import Theory_Page as theory
-import Calculator
-import Simulator as sim
+import Windows.Theory_Page as theory
+import Windows.Calculator as Calculator
+import Windows.Simulator as sim
 
 def home():# code for home page
     homewindow = tk.Tk()
