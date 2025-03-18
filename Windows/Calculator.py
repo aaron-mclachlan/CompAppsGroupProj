@@ -71,7 +71,7 @@ def calculator(): #Code for calculator window:
                 user_temp1.get(), user_temp2.get(), bar_length.get(),
                 bar_width.get(), bar_height.get(), thermal_conductivity.get(), heat_flow.get()
             )
-        
+            
             # Pre calculations to simplify maths later
             A = W * H  # Cross-sectional area
             dT = abs(T1 - T2) #change in temp
@@ -109,12 +109,29 @@ def calculator(): #Code for calculator window:
             messagebox.showinfo("Result", f"Calculated {solve_for} to be {result:.3f}")
 
             #Error Exceptions
-        except tk.TclError as blank_input_err: #deals with blank inputs
-            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-            message = template.format(type(blank_input_err).__name__, blank_input_err.args)
-            print(f"Error readout\n,{message},\n")
-            messagebox.showerror("error",'Please ensure that there are no blank inputs')
-            
+        #####except tk.TclError as blank_input_err: #deals with blank inputs
+            ####template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            ###message = template.format(type(blank_input_err).__name__, blank_input_err.args)
+            ##print(f"Error readout\n,{message},\n")
+            #messagebox.showerror("error",'Please ensure that there are no blank inputs')
+        
+        except tk.TclError as input_err:
+
+            if input_err.args == "'expected floating-point number but got ""',":
+                template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                message = template.format(type(input_err).__name__, input_err.args)
+                messagebox.showerror('Error',f"Please ensure there are no blank inputs.\n{input_err.args}")
+                print(f"Error readout\n{message}\n")
+
+            else:
+                template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+                message = template.format(type(input_err).__name__, input_err.args)
+                messagebox.showerror('Error',f"Please ensure you input numbers only, no blank spaces.\n{input_err.args}")
+                print(f"Error readout\n{message}\n")
+
+
+
+
         except Exception as MiscErr: #misc errors, gives a detailed readout for troubleshooting
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"
             message = template.format(type(MiscErr).__name__, MiscErr.args)
