@@ -12,7 +12,7 @@ def simulation_page():#Code for simulation page
     #Defining Varaibles
     selected_mat = tk.Variable(value="Aluminium (205)")
     Temp_1 = tk.StringVar(value=0.0)
-    Temp_2 = tk.StringVar()
+    Temp_2 = tk.StringVar(value= 0.0)
     Length = tk.StringVar(value=1)
     Width = tk.StringVar(value=0.0)
     Height = tk.StringVar(value=0.0)
@@ -63,7 +63,7 @@ def simulation_page():#Code for simulation page
             Q = (k*A*dT)/L
             messagebox.showinfo("Output",f"Variables:\nT1:{T1} \nT2:{T2}\nL:{L} \nW:{W} \nH:{H} \nMaterial:{mat} \nConductivity:{k}\ndt:{dT}\nA:{A}\nQ:{Q:.3f}")
         
-    
+
 
         except Exception as MiscErr: #misc errors, gives a detailed readout for troubleshooting
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"
