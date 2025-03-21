@@ -163,6 +163,7 @@ def calculator(): #Code for calculator window:
     ttk.Button(window, text='Return Home', command=returnhome).grid(row=9,column=0,columnspan=2)
     
     window.mainloop()
+    
 
 
         
