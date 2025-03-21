@@ -3,6 +3,7 @@ from tkinter import messagebox,ttk
 import time
 import Windows.Calculator as Calculator
 import Windows.Home as Home
+import Windows.Animation as ani
 
 def simulation_page():#Code for simulation page
     sim_pg = tk.Tk()
@@ -11,11 +12,11 @@ def simulation_page():#Code for simulation page
 
     #Defining Varaibles
     selected_mat = tk.Variable(value="Aluminium (205)")
-    Temp_1 = tk.StringVar(value=0.0)
+    Temp_1 = tk.StringVar(value=100)
     Temp_2 = tk.StringVar(value= 0.0)
-    Length = tk.StringVar(value=1)
-    Width = tk.StringVar(value=0.0)
-    Height = tk.StringVar(value=0.0)
+    Length = tk.StringVar(value=5)
+    Width = tk.StringVar(value=0.6)
+    Height = tk.StringVar(value=0.4)
 
     #Materials List
     conductivity = {  
@@ -63,13 +64,17 @@ def simulation_page():#Code for simulation page
             Q = (k*A*dT)/L
             messagebox.showinfo("Output",f"Variables:\nT1:{T1} \nT2:{T2}\nL:{L} \nW:{W} \nH:{H} \nMaterial:{mat} \nConductivity:{k}\ndt:{dT}\nA:{A}\nQ:{Q:.3f}")
         
-
+            ani.simulate(H,L)#plotting graph for animation
 
         except Exception as MiscErr: #misc errors, gives a detailed readout for troubleshooting
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"
             message = template.format(type(MiscErr).__name__, MiscErr.args)
             messagebox.showerror("error", message)
             print(f"Error readout\n{message}\n")
+
+
+
+
 
     #input validation, preventing non number inputs
     def callback(input):
