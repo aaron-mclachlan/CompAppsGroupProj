@@ -6,17 +6,17 @@ import Windows.Home as Home
 #Defining calculator commands
 def solve_for_Q(k, A, delta_T, L):
         if L == 0:
-         raise ValueError("Length cannot be zero.")
+         raise ZeroDivisionError("Length cannot be zero.")
         return (k * A * delta_T) / L
 
 def solve_for_k(Q, A, delta_T, L):
     if A == 0 or delta_T == 0 or L == 0:
-        raise ValueError("Area, temperature difference, and length cannot be zero.")
+        raise ZeroDivisionError("Area, temperature difference, and length cannot be zero.")
     return (Q * L) / (A * delta_T)
 
 def solve_for_L(Q, k, A, delta_T):
     if k == 0 or A == 0 or delta_T == 0:
-        raise ValueError("Thermal conductivity, area, and temperature difference cannot be zero.")
+        raise ZeroDivisionError("Thermal conductivity, area, and temperature difference cannot be zero.")
     return (k * A * delta_T) / Q
 
 def solve_for_T1(T2, Q, k, W, H, L):
@@ -30,17 +30,17 @@ def solve_for_T2(T1, Q, k, W, H, L):
 def solve_for_delta_T(Q, k, W, H, L):
     A = W * H
     if k == 0 or A == 0 or L == 0:
-        raise ValueError("Thermal conductivity, area, and length cannot be zero.")
+        raise ZeroDivisionError("Thermal conductivity, area, and length cannot be zero.")
     return Q * L / (k * A)
 
 def solve_for_width(Q, k, H, delta_T, L):
     if k == 0 or H == 0 or delta_T == 0 or L == 0:
-         raise ValueError("Thermal conductivity, height, temperature difference, and length cannot be zero.")
+         raise ZeroDivisionError("Thermal conductivity, height, temperature difference, and length cannot be zero.")
     return (Q * L) / (k * H * delta_T)
 
 def solve_for_height(Q, k, W, delta_T, L):
     if k == 0 or W == 0 or delta_T == 0 or L == 0:
-        raise ValueError("Thermal conductivity, width, temperature difference, and length cannot be zero.")
+        raise ZeroDivisionError("Thermal conductivity, width, temperature difference, and length cannot be zero.")
     return (Q * L) / (k * W * delta_T)
 
 
@@ -51,27 +51,35 @@ def calculator(): #Code for calculator window:
 
 
     # Defining Variables:
-    user_temp1 = tk.DoubleVar()
-    user_temp2 = tk.DoubleVar()
-    delta_T = tk.DoubleVar()
-    bar_length = tk.DoubleVar()
-    bar_width = tk.DoubleVar()
-    bar_height = tk.DoubleVar()
-    thermal_conductivity = tk.DoubleVar()
-    heat_flow = tk.DoubleVar()
+    user_temp1 = tk.StringVar(value=0.0)
+    user_temp2 = tk.StringVar(value=0.0)
+    delta_T = tk.StringVar(value=0.0)
+    bar_length = tk.StringVar(value=0.0)
+    bar_width = tk.StringVar(value=0.0)
+    bar_height = tk.StringVar(value=0.0)
+    thermal_conductivity = tk.StringVar(value=0.0)
+    heat_flow = tk.StringVar(value=0.0)
     
     variable_to_solve = tk.StringVar(value="Q")
     
+    def returnhome():
+        window.destroy()
+        Home.home()  
 
     def calculate(): #Defining what happens when calculate button is pressed
         try:
 
-            #assiging values from variables:
-            T1, T2, L, W, H, k, Q = (
-                user_temp1.get(), user_temp2.get(), bar_length.get(),
-                bar_width.get(), bar_height.get(), thermal_conductivity.get(), heat_flow.get()
-            )
-            
+            #Getting values from inputs and preventing blank inputs (Defaulting to zero)
+            T1 = float(user_temp1.get()) if user_temp1.get() != "" else (user_temp1.set(0.0) or 0.0)
+            T2 = float(user_temp2.get()) if user_temp2.get() != "" else (user_temp2.set(0.0) or 0.0)
+            L = float(bar_length.get()) if bar_length.get() != "" else (bar_length.set(0.0) or 0.0)
+            W = float(bar_width.get()) if bar_width.get() != "" else (bar_width.set(0.0) or 0.0)
+            H = float(bar_height.get()) if bar_height.get() != "" else (bar_height.set(0.0) or 0.0)
+            k = float(thermal_conductivity.get()) if thermal_conductivity.get() != "" else (thermal_conductivity.set(0.0) or 0.0)
+            Q = float(heat_flow.get()) if heat_flow.get() != "" else (heat_flow.set(0.0) or 0.0)
+
+            window.update()
+
             # Pre calculations to simplify maths later
             A = W * H  # Cross-sectional area
             dT = abs(T1 - T2) #change in temp
@@ -108,29 +116,8 @@ def calculator(): #Code for calculator window:
             #Messagebox for output:
             messagebox.showinfo("Result", f"Calculated {solve_for} to be {result:.3f}")
 
-            #Error Exceptions
-        #####except tk.TclError as blank_input_err: #deals with blank inputs
-            ####template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-            ###message = template.format(type(blank_input_err).__name__, blank_input_err.args)
-            ##print(f"Error readout\n,{message},\n")
-            #messagebox.showerror("error",'Please ensure that there are no blank inputs')
-        
-        except tk.TclError as input_err:
-
-            if input_err.args == "'expected floating-point number but got ""',":
-                template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-                message = template.format(type(input_err).__name__, input_err.args)
-                messagebox.showerror('Error',f"Please ensure there are no blank inputs.\n{input_err.args}")
-                print(f"Error readout\n{message}\n")
-
-            else:
-                template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-                message = template.format(type(input_err).__name__, input_err.args)
-                messagebox.showerror('Error',f"Please ensure you input numbers only, no blank spaces.\n{input_err.args}")
-                print(f"Error readout\n{message}\n")
-
-
-
+        except ZeroDivisionError as div0err:
+            messagebox.showerror('error',div0err)
 
         except Exception as MiscErr: #misc errors, gives a detailed readout for troubleshooting
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"
@@ -138,9 +125,19 @@ def calculator(): #Code for calculator window:
             messagebox.showerror("error", message)
             print(f"Error readout\n{message}\n")
 
-    def returnhome():
-        window.destroy()
-        Home.home()
+
+    #input validation, preventing non number inputs
+    def callback(input):
+        if input == "" or input == "-": #Allow for user to delete input and input "-"
+            return True
+        try:
+            float(input)#Checks input is a float
+            return True
+        except ValueError:# dissallows other input
+            return False
+       
+    validate_inp= window.register(callback)
+
 
     #Selecting what to solve for
     ttk.Label(window, text="Solve for:").grid(row=0, column=0)
@@ -148,19 +145,19 @@ def calculator(): #Code for calculator window:
     
     # Inputs & labels
     ttk.Label(window, text="Temperature 1[T1] (Kelvin):").grid(row=1, column=0)
-    ttk.Entry(window, textvariable=user_temp1).grid(row=1, column=1)
+    ttk.Entry(window, textvariable=user_temp1,validate="key",validatecommand=(validate_inp,"%P")).grid(row=1, column=1)
     ttk.Label(window, text="Temperatre 2[T2] (Kelvin):").grid(row=2, column=0)
-    ttk.Entry(window, textvariable=user_temp2).grid(row=2, column=1)
+    ttk.Entry(window, textvariable=user_temp2,validate="key",validatecommand=(validate_inp,"%P")).grid(row=2, column=1)
     ttk.Label(window, text="Length[L] (Meters):").grid(row=3, column=0)
-    ttk.Entry(window, textvariable=bar_length).grid(row=3, column=1)
+    ttk.Entry(window, textvariable=bar_length,validate="key",validatecommand=(validate_inp,"%P")).grid(row=3, column=1)
     ttk.Label(window, text="Width[W] (Meters):").grid(row=4, column=0)
-    ttk.Entry(window, textvariable=bar_width).grid(row=4, column=1)
+    ttk.Entry(window, textvariable=bar_width,validate="key",validatecommand=(validate_inp,"%P")).grid(row=4, column=1)
     ttk.Label(window, text="Height[H] (Meters):").grid(row=5, column=0)
-    ttk.Entry(window, textvariable=bar_height).grid(row=5, column=1)
+    ttk.Entry(window, textvariable=bar_height,validate="key",validatecommand=(validate_inp,"%P")).grid(row=5, column=1)
     ttk.Label(window, text="Thermal Conductivity[k] (w/mK):").grid(row=6, column=0)
-    ttk.Entry(window, textvariable=thermal_conductivity).grid(row=6, column=1)
+    ttk.Entry(window, textvariable=thermal_conductivity,validate="key",validatecommand=(validate_inp,"%P")).grid(row=6, column=1)
     ttk.Label(window, text="Heat Flow[Q] (Watts):").grid(row=7, column=0)
-    ttk.Entry(window, textvariable=heat_flow).grid(row=7, column=1)
+    ttk.Entry(window, textvariable=heat_flow,validate="key",validatecommand=(validate_inp,"%P")).grid(row=7, column=1)
     
     ttk.Button(window, text="Calculate", command=calculate).grid(row=8, column=0, columnspan=2)
     ttk.Button(window, text='Return Home', command=returnhome).grid(row=9,column=0,columnspan=2)
