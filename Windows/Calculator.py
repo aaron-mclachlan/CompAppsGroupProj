@@ -1,13 +1,13 @@
 import tkinter as tk
-from tkinter import messagebox,ttk
-import time
+from tkinter import messagebox, ttk
+from PIL import Image, ImageTk
 import Windows.Home as Home
 
-#Defining calculator commands
+# Thermal conduction calculation functions
 def solve_for_Q(k, A, delta_T, L):
-        if L == 0:
-         raise ZeroDivisionError("Length cannot be zero.")
-        return (k * A * delta_T) / L
+    if L == 0:
+        raise ZeroDivisionError("Length cannot be zero.")
+    return (k * A * delta_T) / L
 
 def solve_for_k(Q, A, delta_T, L):
     if A == 0 or delta_T == 0 or L == 0:
@@ -35,7 +35,7 @@ def solve_for_delta_T(Q, k, W, H, L):
 
 def solve_for_width(Q, k, H, delta_T, L):
     if k == 0 or H == 0 or delta_T == 0 or L == 0:
-         raise ZeroDivisionError("Thermal conductivity, height, temperature difference, and length cannot be zero.")
+        raise ZeroDivisionError("Thermal conductivity, height, temperature difference, and length cannot be zero.")
     return (Q * L) / (k * H * delta_T)
 
 def solve_for_height(Q, k, W, delta_T, L):
@@ -43,130 +43,182 @@ def solve_for_height(Q, k, W, delta_T, L):
         raise ZeroDivisionError("Thermal conductivity, width, temperature difference, and length cannot be zero.")
     return (Q * L) / (k * W * delta_T)
 
+#Units dict
+units = {
+    "Q":"Watts",
+    "k": "W/mk",
+    "L" : "Meters",
+    "T1" : "Kelvin",
+    "T2" : "Kelvin",
+    "ΔT" : "Kelvin",
+    "W" : "Meters",
+    "H" : "Meters"
+    
+}
 
-def calculator(): #Code for calculator window:
+def calculator():
     window = tk.Tk()
-    window.geometry('800x600')  # def window
+    window.geometry('1920x1080')
+    window.state('zoomed')
     window.title('Conduction Calculator')
 
+    # Try to load background image (must be GIF format)
+    try:
+        original_image = Image.open(r"BG_images/CalcBG.gif")  # Make sure the path is correct
+        resized_image = original_image.resize((1920, 1000), Image.Resampling.LANCZOS)  # Resize to 1920x1080
+        bg_image = ImageTk.PhotoImage(resized_image)
 
-    # Defining Variables:
-    user_temp1 = tk.StringVar(value=0.0)
-    user_temp2 = tk.StringVar(value=0.0)
-    delta_T = tk.StringVar(value=0.0)
-    bar_length = tk.StringVar(value=0.0)
-    bar_width = tk.StringVar(value=0.0)
-    bar_height = tk.StringVar(value=0.0)
-    thermal_conductivity = tk.StringVar(value=0.0)
-    heat_flow = tk.StringVar(value=0.0)
-    
+        bg_label = tk.Label(window, image=bg_image)
+        bg_label.image = bg_image  # Keep a reference to prevent garbage collection
+        bg_label.place(x=0, y=0, relwidth=1, relheight=1)  # Stretch to full window
+
+    except Exception as e:
+        print(f"Error loading background image: {e}")
+        window.configure(bg='lightblue')  # Fallback colo
+
+    # Create a semi-transparent frame for the calculator
+    main_frame = tk.Frame(window, bg='white', bd=2, relief='ridge', padx=10, pady=10)
+    main_frame.place(relx=0.5, rely=0.6, anchor='center')
+
+    # Variables
+    user_temp1 = tk.StringVar(value='0.0')
+    user_temp2 = tk.StringVar(value='0.0')
+    delta_T = tk.StringVar(value='0.0')
+    bar_length = tk.StringVar(value='0.0')
+    bar_width = tk.StringVar(value='0.0')
+    bar_height = tk.StringVar(value='0.0')
+    thermal_conductivity = tk.StringVar(value='0.0')
+    heat_flow = tk.StringVar(value='0.0')
     variable_to_solve = tk.StringVar(value="Q")
-    
+
     def returnhome():
         window.destroy()
-        Home.home()  
+        Home.home()
+        print("Returning to home...")
 
-    def calculate(): #Defining what happens when calculate button is pressed
+    def calculate():
         try:
+            # Get values from inputs
+            T1 = float(user_temp1.get()) if user_temp1.get() else 0.0
+            T2 = float(user_temp2.get()) if user_temp2.get() else 0.0
+            L = float(bar_length.get()) if bar_length.get() else 0.0
+            W = float(bar_width.get()) if bar_width.get() else 0.0
+            H = float(bar_height.get()) if bar_height.get() else 0.0
+            k = float(thermal_conductivity.get()) if thermal_conductivity.get() else 0.0
+            Q = float(heat_flow.get()) if heat_flow.get() else 0.0
 
-            #Getting values from inputs and preventing blank inputs (Defaulting to zero)
-            T1 = float(user_temp1.get()) if user_temp1.get() != "" else (user_temp1.set(0.0) or 0.0)
-            T2 = float(user_temp2.get()) if user_temp2.get() != "" else (user_temp2.set(0.0) or 0.0)
-            L = float(bar_length.get()) if bar_length.get() != "" else (bar_length.set(0.0) or 0.0)
-            W = float(bar_width.get()) if bar_width.get() != "" else (bar_width.set(0.0) or 0.0)
-            H = float(bar_height.get()) if bar_height.get() != "" else (bar_height.set(0.0) or 0.0)
-            k = float(thermal_conductivity.get()) if thermal_conductivity.get() != "" else (thermal_conductivity.set(0.0) or 0.0)
-            Q = float(heat_flow.get()) if heat_flow.get() != "" else (heat_flow.set(0.0) or 0.0)
+            A = W * H
+            dT = abs(T1 - T2)
+            solve_for = variable_to_solve.get()
 
-            window.update()
-
-            # Pre calculations to simplify maths later
-            A = W * H  # Cross-sectional area
-            dT = abs(T1 - T2) #change in temp
-            solve_for = variable_to_solve.get() #getting variable to solve for
-
-            #Checking what to solve for and performing calculation:
             if solve_for == "Q":
-                result = solve_for_Q(k,A,dT,L)
-                heat_flow.set(result)
+                result = solve_for_Q(k, A, dT, L)
+                heat_flow.set(f"{result:.3f}")
             elif solve_for == "k":
-                result = solve_for_k(Q,A,dT,L)
-                thermal_conductivity.set(result)
+                result = solve_for_k(Q, A, dT, L)
+                thermal_conductivity.set(f"{result:.3f}")
             elif solve_for == "L":
-                result = solve_for_L(Q,k,A,dT)
-                bar_length.set(result)
+                result = solve_for_L(Q, k, A, dT)
+                bar_length.set(f"{result:.3f}")
             elif solve_for == "T1":
-                result = solve_for_T1(T2,Q,k,W,H,L)
-                user_temp1.set(result)
+                result = solve_for_T1(T2, Q, k, W, H, L)
+                user_temp1.set(f"{result:.3f}")
             elif solve_for == "T2":
-                result = solve_for_T2(T1,Q,k,W,H,L)
-                user_temp2.set(result)
+                result = solve_for_T2(T1, Q, k, W, H, L)
+                user_temp2.set(f"{result:.3f}")
             elif solve_for == "ΔT":
-                result = solve_for_delta_T(Q,k,W,H,L)
-                delta_T.set(result)
+                result = solve_for_delta_T(Q, k, W, H, L)
+                delta_T.set(f"{result:.3f}")
             elif solve_for == "W":
-                result = solve_for_width(Q,k,H,dT,L)
-                bar_width.set(result)
+                result = solve_for_width(Q, k, H, dT, L)
+                bar_width.set(f"{result:.3f}")
             elif solve_for == "H":
-                result = solve_for_height(Q,k,W,dT,L)
-                bar_height.set(result)
+                result = solve_for_height(Q, k, W, dT, L)
+                bar_height.set(f"{result:.3f}")
             else:
                 raise ValueError("Invalid selection.")
-            
-            #Messagebox for output:
-            messagebox.showinfo("Result", f"Calculated {solve_for} to be {result:.3f}")
+
+            messagebox.showinfo("Result", f"Calculated {solve_for} = {result:.3f} {units.get(solve_for)}")
 
         except ZeroDivisionError as div0err:
-            messagebox.showerror('error',div0err)
+            messagebox.showerror('Error', str(div0err))
+        except Exception as e:
+            messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
-        except Exception as MiscErr: #misc errors, gives a detailed readout for troubleshooting
-            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
-            message = template.format(type(MiscErr).__name__, MiscErr.args)
-            messagebox.showerror("error", message)
-            print(f"Error readout\n{message}\n")
-
-
-    #input validation, preventing non number inputs
     def callback(input):
-        if input == "" or input == "-": #Allow for user to delete input and input "-"
+        if input == "" or input == "-":
             return True
         try:
-            float(input)#Checks input is a float
+            float(input)
             return True
-        except ValueError:# dissallows other input
+        except ValueError:
             return False
-       
-    validate_inp= window.register(callback)
 
+    validate_inp = window.register(callback)
 
-    #Selecting what to solve for
-    ttk.Label(window, text="Solve for:").grid(row=0, column=0)
-    ttk.Combobox(window, textvariable=variable_to_solve, values=["Q", "k", "L", "T1", "T2", "ΔT", "W", "H"],state='readonly').grid(row=0, column=1)
+    # Create custom styles for colored buttons
+    style = ttk.Style()
     
-    # Inputs & labels
-    ttk.Label(window, text="Temperature 1[T1] (Kelvin):").grid(row=1, column=0)
-    ttk.Entry(window, textvariable=user_temp1,validate="key",validatecommand=(validate_inp,"%P")).grid(row=1, column=1)
-    ttk.Label(window, text="Temperatre 2[T2] (Kelvin):").grid(row=2, column=0)
-    ttk.Entry(window, textvariable=user_temp2,validate="key",validatecommand=(validate_inp,"%P")).grid(row=2, column=1)
-    ttk.Label(window, text="Length[L] (Meters):").grid(row=3, column=0)
-    ttk.Entry(window, textvariable=bar_length,validate="key",validatecommand=(validate_inp,"%P")).grid(row=3, column=1)
-    ttk.Label(window, text="Width[W] (Meters):").grid(row=4, column=0)
-    ttk.Entry(window, textvariable=bar_width,validate="key",validatecommand=(validate_inp,"%P")).grid(row=4, column=1)
-    ttk.Label(window, text="Height[H] (Meters):").grid(row=5, column=0)
-    ttk.Entry(window, textvariable=bar_height,validate="key",validatecommand=(validate_inp,"%P")).grid(row=5, column=1)
-    ttk.Label(window, text="Thermal Conductivity[k] (w/mK):").grid(row=6, column=0)
-    ttk.Entry(window, textvariable=thermal_conductivity,validate="key",validatecommand=(validate_inp,"%P")).grid(row=6, column=1)
-    ttk.Label(window, text="Heat Flow[Q] (Watts):").grid(row=7, column=0)
-    ttk.Entry(window, textvariable=heat_flow,validate="key",validatecommand=(validate_inp,"%P")).grid(row=7, column=1)
+    # Style for calculate button (green)
+    style.configure('Calculate.TButton', 
+                   foreground='purple',
+                   background='#ade1da',
+                   font=('Helvetica', 10, 'bold'),
+                   padding=5,
+                   borderwidth=1)
+    style.map('Calculate.TButton',
+              background=[('active', '#ade1da')])
     
-    ttk.Button(window, text="Calculate", command=calculate).grid(row=8, column=0, columnspan=2)
-    ttk.Button(window, text='Return Home', command=returnhome).grid(row=9,column=0,columnspan=2)
+    # Style for home button (red)
+    style.configure('Home.TButton', 
+                   foreground='purple',
+                   background='#f4b47e',
+                   font=('Helvetica', 10, 'bold'),
+                   padding=5,
+                   borderwidth=1)
+    style.map('Home.TButton',
+              background=[('active', '#f4b47e')])
+
+    # GUI Layout
+    ttk.Label(main_frame, text="Solve for:").grid(row=0, column=0, padx=5, pady=5, sticky='e')
+    ttk.Combobox(main_frame, textvariable=variable_to_solve, 
+                values=["Q", "k", "L", "T1", "T2", "ΔT", "W", "H"],
+                state='readonly').grid(row=0, column=1, padx=5, pady=5, sticky='ew')
+
+    # Input fields
+    fields = [
+        ("Temperature 1 [T1] (K):", user_temp1, 1),
+        ("Temperature 2 [T2] (K):", user_temp2, 2),
+        ("Length [L] (m):", bar_length, 3),
+        ("Width [W] (m):", bar_width, 4),
+        ("Height [H] (m):", bar_height, 5),
+        ("Thermal Conductivity [k] (W/mK):", thermal_conductivity, 6),
+        ("Heat Flow [Q] (W):", heat_flow, 7)
+    ]
+
+    for text, var, row in fields:
+        ttk.Label(main_frame, text=text).grid(row=row, column=0, padx=5, pady=5, sticky='e')
+        ttk.Entry(main_frame, textvariable=var, validate="key",
+                 validatecommand=(validate_inp, "%P")).grid(row=row, column=1, padx=5, pady=5, sticky='ew')
+
+    # Buttons with custom colors
+    ttk.Button(main_frame, 
+              text="Calculate", 
+              command=calculate,
+              style='Calculate.TButton').grid(row=8, column=0, columnspan=2, pady=10, sticky='ew')
     
+    ttk.Button(main_frame,
+              text='Return Home',
+              command=returnhome,
+              style='Home.TButton').grid(row=9, column=0, columnspan=2, pady=5, sticky='ew')
+
+    # Configure grid to expand properly
+    main_frame.grid_columnconfigure(0, weight=1)
+    main_frame.grid_columnconfigure(1, weight=2)
+    for i in range(10):
+        main_frame.grid_rowconfigure(i, weight=1)
+
     window.mainloop()
-    
 
-
-        
-
-
-
+if __name__ == "__main__":
+    calculator()

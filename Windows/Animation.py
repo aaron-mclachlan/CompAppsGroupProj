@@ -1,4 +1,5 @@
 import numpy
+import re
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import matplotlib.cm as cm
@@ -8,7 +9,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-def simulate(Height, Length,Q):
+
+
+def simulate(Height, Length,Q,mat,dt_pos):
     root = tk.Tk()
     root.title("Simulator")
     root.geometry("1920x1080")
@@ -26,46 +29,53 @@ def simulate(Height, Length,Q):
     ax.set_ylim(-1, 1)  # y axis limts
     ax.set_xlabel("Bar Length (m)") #x- axis label
 
-    outline_bar, = ax.barh(y,x,height=bar_thick,color='blue')
+
+    #Defining bar colors for -ve dT values:
+    outline_colour = '#4faef7'
+    ani_color = '#f7664f'
+ 
+    outline_bar, = ax.barh(y,x,height=bar_thick,color=outline_colour)
     
    
     canvas = FigureCanvasTkAgg(fig, master=root)
-    canvas.get_tk_widget().pack()
+    canvas.get_tk_widget().grid(row=0,column=0,columnspan=2) #Place in tkinter window
 
     #Animated Bar design
-    ani_bar, = ax.barh(y, [0], height=bar_thick, color='red') # defining bar
-    colormap = plt.cm.Reds
+    ani_bar, = ax.barh(y, [0], height=bar_thick, color=ani_color) # defining bar
 
     Q_max = 500 #Max Q value for animation speed scaling
-    def animate_bar(frame=0):#Bar animation
+    def animate_bar(frame=0):#animates bar
         #Adjusting speed based on Q
-        speed_factor = Q/Q_max
+        speed_factor = abs(Q/Q_max)
         frame_delay = int(max(5,50*(1-speed_factor))) #Low Q -> slower update
         step_size = max(0.01,0.1*speed_factor) #Large Q -> larger step per frame
 
         if frame < Length:  # Stop when reaching max length
             ani_bar.set_width(frame)#extending the bar per frame
-            color = colormap(frame/Length) #get color from colormap
-            ani_bar.set_facecolor(color)
             canvas.draw()  # Update the canvas
             root.after(frame_delay, animate_bar, frame + step_size)  # Schedule next update
         else:
             ani_bar.set_width(Length)
-            ani_bar.set_facecolor(colormap(0.99))
+            #ani_bar.set_facecolor(colormap(0.99))
             canvas.draw()
 
     # Start the animation
     animate_bar()
 
-    def restart_animation():#Restart animation
+    def restart_animation():#for restart animation bttn
         animate_bar()
 
-    def close_window():
+    def close_window():#For close window bttn
         root.destroy()
 
-    ttk.Button(root,text="Restart animation",command=restart_animation).pack()
-    ttk.Button(root,text="Exit Simulation",command=close_window).pack()
-
+    def remove_brac(text):#Removes brackets from material
+        return str(re.sub(r"\s*\([^)]*\)", "", text))
+    
+    
+    ttk.Label(root,text=f"Heat flow rate: {Q} J/s across {Length}m of {remove_brac(mat).lower()}").grid(row=1,column=0,columnspan=2)
+    ttk.Button(root,text="Restart animation",command=restart_animation).grid(row=2,column=0,columnspan=2)
+    ttk.Button(root,text="Exit Simulation",command=close_window).grid(row=3,column=0,columnspan=2)
+    
 
 
 

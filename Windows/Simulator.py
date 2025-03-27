@@ -7,16 +7,18 @@ import Windows.Animation as ani
 
 def simulation_page():#Code for simulation page
     sim_pg = tk.Tk()
-    sim_pg.geometry('800x600')
+    win_width = sim_pg.winfo_screenwidth()
+    win_height = sim_pg.winfo_screenheight()
+    sim_pg.geometry("%dx%d" % (win_width, win_height))
     sim_pg.title('Simulator')
 
     #Defining Varaibles
     selected_mat = tk.Variable(value="Mild Steel (50)")
-    Temp_1 = tk.StringVar(value=100)
+    Temp_1 = tk.StringVar(value=0.0)
     Temp_2 = tk.StringVar(value= 0.0)
-    Length = tk.StringVar(value=5)
-    Width = tk.StringVar(value=0.6)
-    Height = tk.StringVar(value=0.4)
+    Length = tk.StringVar(value=1)
+    Width = tk.StringVar(value=0.0)
+    Height = tk.StringVar(value=0.0)
 
     #Materials List
     conductivity = {  
@@ -40,7 +42,7 @@ def simulation_page():#Code for simulation page
 
     def simulate():
         try:
-            #Getting values and preventing blank inputs, defaults to zero if blank except length (defaults to 1)
+            #Getting values and preventing blank inputs, defaults to 0.0 if blank except length (defaults to 1)
             T1 = float(Temp_1.get()) if Temp_1.get() != "" else (Temp_1.set(0.0) or 0.0)
             T2 = float(Temp_2.get()) if Temp_2.get() != "" else (Temp_2.set(0.0) or 0.0)
             L = float(Length.get()) if Length.get() != "" or Length.get() == 0 else (Length.set(1) or 1)
@@ -50,6 +52,22 @@ def simulation_page():#Code for simulation page
 
             if L == 0 : #Preventing div/0
                 raise ZeroDivisionError('Length cannot be Zero')
+            
+            if T1 == 0 and T2 == 0: #Preventing zero values breaking animation
+                raise ValueError("Please make sure both temperatures are not zero")
+            
+            if T1 == T2:
+                raise ValueError("Please ensure there is a change in temperature")
+            if W == 0 or H == 0:
+                if H == 0 and W == 0:
+                    issue = "Height and width are both zero"
+                elif W == 0:
+                    issue = "Width is zero"
+                else:
+                    issue = "Height is zero"
+
+
+                raise ValueError(f"Please make sure no values are equal to zero: {issue}")
             
             #Getting material and its conductivity
             mat = selected_mat.get()
@@ -64,13 +82,31 @@ def simulation_page():#Code for simulation page
             Q = (k*A*dT)/L
             messagebox.showinfo("Output",f"Variables:\nT1:{T1} \nT2:{T2}\nL:{L} \nW:{W} \nH:{H} \nMaterial:{mat} \nConductivity:{k}\ndt:{dT}\nA:{A}\nQ:{Q:.3f}")
         
-            ani.simulate(H,L,Q)#plotting graph for animation
+            if dT >= 0 :
+                dt_pos = True
+            else:
+                dt_pos = False
+
+            ani.simulate(H,L,Q,mat,dt_pos)#plotting graph for animation
+        
+        except ValueError as input_err:
+            messagebox.showerror('Error',f"An error occured:\n{input_err.args}")
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            message = template.format(type(input_err).__name__, input_err.args)
+            print(f"\nError readout\n{message}\n\n")
+
+        except ZeroDivisionError as div0err:
+            messagebox.showerror('Error',f"An error occured:\n{div0err.args}")
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            message = template.format(type(div0err).__name__, div0err.args)
+            print(f"\nError readout\n{message}\n\n")
+
 
         except Exception as MiscErr: #misc errors, gives a detailed readout for troubleshooting
             template = "An exception of type {0} occurred. Arguments:\n{1!r}"
             message = template.format(type(MiscErr).__name__, MiscErr.args)
             messagebox.showerror("error", message)
-            print(f"Error readout\n{message}\n")
+            print(f"\nError readout\n{message}\n\n")
 
 
 
