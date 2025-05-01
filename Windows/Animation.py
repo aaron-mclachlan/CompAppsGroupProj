@@ -8,6 +8,7 @@ from tkinter import ttk
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from PIL import ImageTk, Image
 
 
 
@@ -15,8 +16,16 @@ def simulate(Height, Length,Q,mat,dt_pos):
     root = tk.Tk()
     root.title("Simulator")
     root.geometry("1920x1080")
+    root.configure(background="#fff1ef")
 
-    fig = plt.Figure(figsize=(12,5),dpi=100)
+    
+
+    holdingframe = tk.Frame(root,bg="#fff1ef", relief='ridge', padx=10, pady=10)
+    holdingframe.place(relx=0.5, rely=0.5,anchor="center",)
+
+    
+
+    fig = plt.Figure(figsize=(12,5),dpi=100,facecolor="#fff1ef")
 
     x = [Length]
     y = [f"Bar Height: {Height} m"]
@@ -28,6 +37,7 @@ def simulate(Height, Length,Q,mat,dt_pos):
     ax.set_xlim(0, Length * 1.1)  # x- axis limits
     ax.set_ylim(-1, 1)  # y axis limts
     ax.set_xlabel("Bar Length (m)") #x- axis label
+    ax.set_facecolor("#fff1ef")
 
 
     #Defining bar colors for -ve dT values:
@@ -37,7 +47,7 @@ def simulate(Height, Length,Q,mat,dt_pos):
     outline_bar, = ax.barh(y,x,height=bar_thick,color=outline_colour)
     
    
-    canvas = FigureCanvasTkAgg(fig, master=root)
+    canvas = FigureCanvasTkAgg(fig, master=holdingframe)
     canvas.get_tk_widget().grid(row=0,column=0,columnspan=2) #Place in tkinter window
 
     #Animated Bar design
@@ -72,13 +82,14 @@ def simulate(Height, Length,Q,mat,dt_pos):
         return str(re.sub(r"\s*\([^)]*\)", "", text))
     
     
-    ttk.Label(root,text=f"Heat flow rate: {Q} J/s across {Length}m of {remove_brac(mat).lower()}").grid(row=1,column=0,columnspan=2)
-    ttk.Button(root,text="Restart animation",command=restart_animation).grid(row=2,column=0,columnspan=2)
-    ttk.Button(root,text="Exit Simulation",command=close_window).grid(row=3,column=0,columnspan=2)
+   
     
 
+    
 
-
+    ttk.Label(holdingframe,text=f"Heat flow rate: {Q} J/s across {Length}m of {remove_brac(mat).lower()}",anchor="center").grid(row=1,column=0,columnspan=2,sticky="ew")
+    ttk.Button(holdingframe,text="Restart animation",command=restart_animation).grid(row=2,column=0,columnspan=2,sticky="ew")
+    ttk.Button(holdingframe,text="Exit Simulation",command=close_window).grid(row=3,column=0,columnspan=2,sticky="ew")
     
 
     root.mainloop()

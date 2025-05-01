@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox,ttk
-import time
+from PIL import ImageTk, Image
 import Windows.Calculator as Calculator
 import Windows.Home as Home
 import Windows.Animation as ani
@@ -12,11 +12,41 @@ def simulation_page():#Code for simulation page
     sim_pg.geometry("%dx%d" % (win_width, win_height))
     sim_pg.title('Simulator')
 
+
+
+     #Background image
+    def background_img(event=None):  # Scale the background image
+        new_width = sim_pg.winfo_width()  # Get current width
+        new_height = sim_pg.winfo_height()  # Get current height
+        scaled_img = load.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        new_img = ImageTk.PhotoImage(scaled_img)
+        backgroundLabel.config(image=new_img)
+        backgroundLabel.image = new_img  # Prevent garbage collection
+
+    # Load and display the background image
+    path = "BG_images/SimpgBG.png"  # Make sure path is correct
+    load = Image.open(path)
+
+    # Initial image (will be resized immediately after)
+    img = ImageTk.PhotoImage(load)
+    backgroundLabel = tk.Label(sim_pg, image=img)
+    backgroundLabel.place(x=0, y=0, relwidth=1, relheight=1)
+
+    # Force an immediate resize to match the window
+    sim_pg.after(100, background_img)
+
+    # Bind resize event to keep updating the background
+    sim_pg.bind("<Configure>", background_img)
+
+
+
+
+
     #Defining Varaibles
     selected_mat = tk.Variable(value="Mild Steel (50)")
     Temp_1 = tk.StringVar(value=0.0)
     Temp_2 = tk.StringVar(value= 0.0)
-    Length = tk.StringVar(value=1)
+    Length = tk.StringVar(value=0.0)
     Width = tk.StringVar(value=0.0)
     Height = tk.StringVar(value=0.0)
 
@@ -35,20 +65,25 @@ def simulation_page():#Code for simulation page
     "Stainless Steel (15)": 15  
 }  
 
-    def close_sim():
+    def close_sim():#for home button
         sim_pg.destroy()
         Home.home()
 
 
-    def simulate():
+    def simulate():#for simulate button
         try:
+            
             #Getting values and preventing blank inputs, defaults to 0.0 if blank except length (defaults to 1)
-            T1 = float(Temp_1.get()) if Temp_1.get() != "" else (Temp_1.set(0.0) or 0.0)
-            T2 = float(Temp_2.get()) if Temp_2.get() != "" else (Temp_2.set(0.0) or 0.0)
-            L = float(Length.get()) if Length.get() != "" or Length.get() == 0 else (Length.set(1) or 1)
-            W = float(Width.get()) if Width.get() != "" else (Width.set(0.0) or 0.0)
-            H = float(Height.get()) if Height.get() != "" else (Height.set(0.0) or 0.0)
+            T1 = (Temp_1.get()) if Temp_1.get() != "" else (Temp_1.set(0.0) or 0.0)
+            T2 = (Temp_2.get()) if Temp_2.get() != "" else (Temp_2.set(0.0) or 0.0)
+            L = (Length.get()) if Length.get() != "" or Length.get() == 0 else (Length.set(1) or 1)
+            W = (Width.get()) if Width.get() != "" else (Width.set(0.0) or 0.0)
+            H = (Height.get()) if Height.get() != "" else (Height.set(0.0) or 0.0)
             sim_pg.update()
+            if T1 == "-" or T2 == "-" or L == "-" or W == "-" or H == "-":
+                raise ValueError("Please Make sure you input a number and not just a symbol on its own")
+            
+            T1,T2,L,W,H = float(T1),float(T2),float(L),float(W),float(H)
 
             if L == 0 : #Preventing div/0
                 raise ZeroDivisionError('Length cannot be Zero')
@@ -57,7 +92,7 @@ def simulation_page():#Code for simulation page
                 raise ValueError("Please make sure both temperatures are not zero")
             
             if T1 == T2:
-                raise ValueError("Please ensure there is a change in temperature")
+                raise ValueError("Please ensure both temperatures are not the same value")
             if W == 0 or H == 0:
                 if H == 0 and W == 0:
                     issue = "Height and width are both zero"
@@ -68,6 +103,8 @@ def simulation_page():#Code for simulation page
 
 
                 raise ValueError(f"Please make sure no values are equal to zero: {issue}")
+            
+            
             
             #Getting material and its conductivity
             mat = selected_mat.get()
@@ -80,7 +117,7 @@ def simulation_page():#Code for simulation page
 
             #Heat flow rate for simulation
             Q = (k*A*dT)/L
-            messagebox.showinfo("Output",f"Variables:\nT1:{T1} \nT2:{T2}\nL:{L} \nW:{W} \nH:{H} \nMaterial:{mat} \nConductivity:{k}\ndt:{dT}\nA:{A}\nQ:{Q:.3f}")
+            print("Output",f"Variables:\nT1:{T1} \nT2:{T2}\nL:{L} \nW:{W} \nH:{H} \nMaterial:{mat} \nConductivity:{k}\ndt:{dT}\nA:{A}\nQ:{Q:.3f}")
         
             if dT >= 0 :
                 dt_pos = True
@@ -108,10 +145,6 @@ def simulation_page():#Code for simulation page
             messagebox.showerror("error", message)
             print(f"\nError readout\n{message}\n\n")
 
-
-
-
-
     #input validation, preventing non number inputs
     def callback(input):
         if input == "" or input == "-": #Allow for user to delete input and input "-"
@@ -121,32 +154,56 @@ def simulation_page():#Code for simulation page
             return True
         except ValueError:# dissallows other input
             return False
-       
     validate_inp= sim_pg.register(callback)
 
 
+
+ #Semi-trasparent frame to place inputs in
+    Input_frame = tk.Frame(sim_pg,bg="#fff1ef", relief='ridge', padx=10, pady=10)
+    Input_frame.place(relx=0.5, rely=0.5,anchor="center")
+
+
     #Inputs
-    mat_lbl = ttk.Label(sim_pg,text="Select Material\n(Thermal conductivity in W/mK)",justify="center").grid(row=0,column=0)
-    mat_dropdown = ttk.Combobox(sim_pg,textvariable=selected_mat,values=[
+    mat_lbl = ttk.Label(Input_frame,text="Select Material\n(Thermal conductivity in W/mK)",justify="center")
+    mat_lbl.grid(row=0,column=0,padx=5,pady=5,sticky='e')
+
+    mat_dropdown = ttk.Combobox(Input_frame,textvariable=selected_mat,values=[
         "Aerogel (0.013)", "Aluminium (205)", "Copper (393)", "Diamond (2000)",
         "Firebrick (0.4)", "Glass (1)", "Gold (310)", "Ice (2.4)", "Mild Steel (50)", 
         "Silver (406)", "Stainless Steel (15)"],state='readonly')
-    mat_dropdown.grid(row=0,column=1)
+    mat_dropdown.grid(row=0,column=1,padx=5,pady=5,sticky='ew')
 
-    Temp1_lbl = ttk.Label(sim_pg,text="Starting Temperature (K)").grid(row=1,column=0)
-    Temp1_inp = ttk.Entry(sim_pg,textvariable=Temp_1,validate="key",validatecommand=(validate_inp,"%P")).grid(row=1,column=1)
-    Temp_2_lbl = ttk.Label(sim_pg,text="End Temperature (K)").grid(row=2,column=0)
-    Temp_2_inp = ttk.Entry(sim_pg, textvariable=Temp_2,validate="key",validatecommand=(validate_inp,"%P")).grid(row=2,column=1)
 
-    Length_lb = ttk.Label(sim_pg, text="Bar Length (m)").grid(row=3,column=0)
-    Length_inp = ttk.Entry(sim_pg, textvariable=Length,validate="key",validatecommand=(validate_inp,"%P")).grid(row=3,column=1)
-    Width_lbl =ttk.Label(sim_pg,text="Bar Width (m)").grid(row=4,column=0)
-    Width_inp = ttk.Entry(sim_pg, textvariable= Width,validate="key",validatecommand=(validate_inp,"%P")).grid(row=4,column=1)
-    Height_lb =ttk.Label(sim_pg,text='Bar Height (m)').grid(row=5,column=0)
-    Height_inp = ttk.Entry(sim_pg,textvariable=Height,validate="key",validatecommand=(validate_inp,"%P")).grid(row=5,column=1)
+    
+   
+      
+   #GUI Layout
+   
+   #Inputs
+    fields =  [
+        ("Starting Temperature (K)", Temp_1,1),
+        ("End Temperature (K)", Temp_2,2),
+        ("Length (m)", Length, 3),
+        ("Width (m)", Width,4),
+        ("Height (m)", Height,5)
+    ]
 
-    #Simulate Button:
-    simulate_bttn = ttk.Button(sim_pg,text='Simulate',command=simulate).grid(row=6,column=0,columnspan=2)
+    for text,var,row in fields:
+        ttk.Label(Input_frame, text=text,background="#fff1ef").grid(row=row,column=0,padx=5,pady=5,sticky="e")
+        ttk.Entry(Input_frame, textvariable=var,validate="key",validatecommand=(validate_inp,"%P")).grid(row=row,column=1,padx=5,pady=5,sticky='ew')
 
-    ExitSimBttn = ttk.Button(sim_pg, text="Exit Simulator", command=close_sim).grid(row=7,column=0,columnspan=2)
+    
+    simulate_bttn = ttk.Button(Input_frame,text='Simulate',command=simulate)
+    simulate_bttn.grid(row=6,column=0, columnspan=2, pady=10,sticky="ew")
+
+    ExitSimBttn = ttk.Button(Input_frame, text="Exit Simulator", command=close_sim)
+    ExitSimBttn.grid(row=7,column=0, columnspan=2, pady=10,sticky="ew")
+
+    Input_frame.grid_columnconfigure(0,weight=1)
+    Input_frame.grid_columnconfigure(1,weight=2)
+    for rows in range (8):
+        Input_frame.grid_rowconfigure(rows, weight=1)
+
+
+
     sim_pg.mainloop()

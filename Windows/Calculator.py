@@ -99,14 +99,19 @@ def calculator():
     def calculate():
         try:
             # Get values from inputs
-            T1 = float(user_temp1.get()) if user_temp1.get() else 0.0
-            T2 = float(user_temp2.get()) if user_temp2.get() else 0.0
-            L = float(bar_length.get()) if bar_length.get() else 0.0
-            W = float(bar_width.get()) if bar_width.get() else 0.0
-            H = float(bar_height.get()) if bar_height.get() else 0.0
-            k = float(thermal_conductivity.get()) if thermal_conductivity.get() else 0.0
-            Q = float(heat_flow.get()) if heat_flow.get() else 0.0
-
+            T1 = user_temp1.get() if user_temp1.get() else (user_temp1.set(0.0) or 0.0)
+            T2 = user_temp2.get() if user_temp2.get() else (user_temp2.set(0.0) or 0.0)
+            L = bar_length.get() if bar_length.get() else (bar_length.set(0.0) or 0.0)
+            W = bar_width.get() if bar_width.get() else (bar_width.set(0.0) or 0.0)
+            H = bar_height.get() if bar_height.get() else (bar_height.set(0.0) or 0.0)
+            k = thermal_conductivity.get() if thermal_conductivity.get() else (thermal_conductivity.set(0.0) or 0.0)
+            Q = heat_flow.get() if heat_flow.get() else (heat_flow.set(0.0) or 0.0)
+            window.update()
+            
+            if T1 == "-" or T2 == "-" or L == "-" or W == "-" or H == "-" or k == "-" or Q == "-":
+                raise ValueError("Please Make sure you input a number and not just a symbol on its own")
+            
+            T1,T2,L,W,H,k,Q = float(T1),float(T2),float(L),float(W),float(H),float(k),float(Q)
             A = W * H
             dT = abs(T1 - T2)
             solve_for = variable_to_solve.get()
@@ -140,12 +145,27 @@ def calculator():
 
             messagebox.showinfo("Result", f"Calculated {solve_for} = {result:.3f} {units.get(solve_for)}")
 
-        except ZeroDivisionError as div0err:
-            messagebox.showerror('Error', str(div0err))
-        except Exception as e:
-            messagebox.showerror("Error", f"An error occurred: {str(e)}")
+        except ValueError as input_err:
+            messagebox.showerror('Error',f"An error occured:\n{input_err.args}")
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            message = template.format(type(input_err).__name__, input_err.args)
+            print(f"\nError readout\n{message}\n\n")
 
-    def callback(input):
+        except ZeroDivisionError as div0err:
+            messagebox.showerror('Error',f"An error occured:\n{div0err.args}")
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            message = template.format(type(div0err).__name__, div0err.args)
+            print(f"\nError readout\n{message}\n\n")
+
+
+        except Exception as MiscErr: #misc errors, gives a detailed readout for troubleshooting
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            message = template.format(type(MiscErr).__name__, MiscErr.args)
+            messagebox.showerror("error", message)
+            print(f"\nError readout\n{message}\n\n")
+
+
+    def callback(input): #Preventing non useful inputs (integers, - and .)
         if input == "" or input == "-":
             return True
         try:
