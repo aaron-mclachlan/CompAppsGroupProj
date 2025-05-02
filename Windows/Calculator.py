@@ -11,12 +11,12 @@ def solve_for_Q(k, A, delta_T, L):
 
 def solve_for_k(Q, A, delta_T, L):
     if A == 0 or delta_T == 0 or L == 0:
-        raise ZeroDivisionError("Area, temperature difference, and length cannot be zero.")
+        raise ZeroDivisionError("Height/Width, temperature difference, and length cannot be zero.")
     return (Q * L) / (A * delta_T)
 
 def solve_for_L(Q, k, A, delta_T):
     if k == 0 or A == 0 or delta_T == 0:
-        raise ZeroDivisionError("Thermal conductivity, area, and temperature difference cannot be zero.")
+        raise ZeroDivisionError("Thermal conductivity, height/width, and temperature difference cannot be zero.")
     return (k * A * delta_T) / Q
 
 def solve_for_T1(T2, Q, k, W, H, L):
@@ -30,7 +30,7 @@ def solve_for_T2(T1, Q, k, W, H, L):
 def solve_for_delta_T(Q, k, W, H, L):
     A = W * H
     if k == 0 or A == 0 or L == 0:
-        raise ZeroDivisionError("Thermal conductivity, area, and length cannot be zero.")
+        raise ZeroDivisionError("Thermal conductivity, height/width, and length cannot be zero.")
     return Q * L / (k * A)
 
 def solve_for_width(Q, k, H, delta_T, L):

@@ -87,7 +87,7 @@ def simulate(Height, Length,Q,mat,dt_pos):
 
     
 
-    ttk.Label(holdingframe,text=f"Heat flow rate: {Q} J/s across {Length}m of {remove_brac(mat).lower()}",anchor="center").grid(row=1,column=0,columnspan=2,sticky="ew")
+    ttk.Label(holdingframe,text=f"Heat flow rate: {Q:.3f} J/s across {Length}m of {remove_brac(mat).lower()}",anchor="center").grid(row=1,column=0,columnspan=2,sticky="ew")
     ttk.Button(holdingframe,text="Restart animation",command=restart_animation).grid(row=2,column=0,columnspan=2,sticky="ew")
     ttk.Button(holdingframe,text="Exit Simulation",command=close_window).grid(row=3,column=0,columnspan=2,sticky="ew")
     

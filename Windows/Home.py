@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter.messagebox import askyesno
 from PIL import ImageTk, Image
-import time
 import Windows.Theory_Page as theory
 import Windows.Calculator as Calculator
 import Windows.Simulator as sim
@@ -25,6 +25,10 @@ def home(): #code for home page
     def sim_bttn():
         homewindow.destroy()
         sim.simulation_page()  
+
+    def exitbttn():
+        confirm = askyesno(title='Confirmation', message='Are you sure you want to exit?')
+        if confirm: homewindow.destroy()
 
     def background_img(event=None):  # Scale the background image
         new_width = homewindow.winfo_width()  # Get current width
@@ -92,6 +96,9 @@ def home(): #code for home page
 
     theory_bttn = ttk.Button(button_frame, text='Theory',command=theorypg_bttn)
     theory_bttn.grid(row=4, column=0, padx=0, pady=0)
+
+    exit_bttn= ttk.Button(button_frame,text="Exit",command=exitbttn)
+    exit_bttn.grid(row=6,column=0,padx=10,pady=10)
 
     homewindow.mainloop()
 
